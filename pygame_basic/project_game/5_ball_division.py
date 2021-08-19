@@ -90,7 +90,9 @@ balls.append({
     "init_spd_y" : ball_speed_y[0] # y의 최초 속도
 })
 
-
+# 사자질 무기 , 공 정보 저장 변수
+weapon_to_remove = -1
+ball_to_remove = -1
 
 
 running = True
@@ -170,6 +172,85 @@ while running:
 
 
     # 4. 충돌 처리
+
+
+    # 캐릭터의 rect정보 업데이트
+    character_rect = character.get_rect()
+    character_rect.left = character_x_pos
+    character_rect.top = character_y_pos
+
+    for ball_idx, ball_val in enumerate(balls): # enumerate()란 ()안에 있는 리스트에 있는 하나씩 가져와서 현재 볼의 인덱스가 몇번쨰이며(balls_idx), 몇인지 알려줌(balls_val)    
+        ball_pos_x = ball_val["pos_x"]
+        ball_pos_y = ball_val["pos_y"]
+        ball_img_idx = ball_val["img_idx"]
+
+        # 공의 rect 정보 업데이트
+        ball_rect = ball_images[ball_img_idx].get_rect()
+        ball_rect.left = ball_pos_x
+        ball_rect.top = ball_pos_y
+
+        # 공과 캐릭터의 충돌 처리
+
+        if character_rect.colliderect(ball_rect):
+            running = False
+            break
+        
+        # 공과 무기들 충돌 처리
+        for weapon_idx, weapon_val in enumerate(weapons):
+            weapon_pos_x = weapon_val[0]
+            weapon_pos_y = weapon_val[1]
+
+            # 무기 rect 정보 업데이트
+            weapon_rect = weapon.get_rect()
+            weapon_rect.left = weapon_pos_x
+            weapon_rect.top = weapon_pos_y
+
+            #충돌 체크
+            if weapon_rect.colliderect(ball_rect):
+                weapon_to_remove = weapon_idx # 해당 무기 없애기 위한 값 설정
+                ball_to_remove = ball_idx # 해당 공 없애기 위한 값 설정 / 이렇게 하면 ball_idx값이 다른곳으로 저장되어 없어지게된다.
+
+                #공 나누기 (가장 작은 공 제외)
+                if ball_img_idx < 3:
+
+                    # 현재 공의 정보들(크기 , 위치 등)
+                    ball_width = ball_rect.size[0]
+                    ball_height = ball_rect.size[1]
+
+                    # 나누어 진 공의 정보
+                    small_ball_rect = ball_images[ball_img_idx + 1].get_rect()
+                    small_ball_width = small_ball_rect.size[0]
+                    small_ball_height = small_ball_rect.size[1]
+                    
+                    # 나누어 진 공 중 좌측으로 가는 공
+                    balls.append({
+                    "pos_x" : ball_pos_x + (ball_width / 2) - (small_ball_width / 2 ), # 공의 x 좌표
+                    "pos_y" : ball_pos_y + (ball_height /2) - (small_ball_height / 2), # 공의 y 좌표
+                    "img_idx" : ball_img_idx + 1, # 공의 이미지 index
+                    "to_x" : -3 , # x축의 이동방향, -3이면 왼쪽 , 3이면 오른쪽 방정
+                    "to_y" : -6, # y축 이동방향
+                    "init_spd_y" : ball_speed_y[ball_img_idx + 1] # y의 최초 속도
+                    })
+                    balls.append({
+                    "pos_x" : ball_pos_x + (ball_width / 2) - (small_ball_width / 2 ), # 공의 x 좌표
+                    "pos_y" : ball_pos_y + (ball_height /2) - (small_ball_height / 2), # 공의 y 좌표
+                    "img_idx" : ball_img_idx + 1, # 공의 이미지 index
+                    "to_x" :  3 , # x축의 이동방향, -3이면 왼쪽 , 3이면 오른쪽 방정
+                    "to_y" : -6, # y축 이동방향
+                    "init_spd_y" : ball_speed_y[ball_img_idx + 1] # y의 최초 속도
+                    })  
+                
+                break
+
+    # 충돌된 공 or 무기 없애기
+    if ball_to_remove > -1 :
+        del balls[ball_to_remove] # del 은 해당 인덱스에 위치한 값을 제거 / .remove("") "" 안에 있는 값을 제거
+        ball_to_remove = -1
+
+    if weapon_to_remove > -1:
+        del weapons[weapon_to_remove]
+        weapon_to_remove = -1 # 지우는값 초기화  
+
 
 
 
