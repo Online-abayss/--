@@ -95,6 +95,18 @@ weapon_to_remove = -1
 ball_to_remove = -1
 
 
+
+# font 정의
+game_font = pygame.font.Font(None, 40)
+total_time = 100
+start_ticks = pygame.time.get_ticks() # 시작 시간 정의
+
+# 게임 종료 메세지
+game_result = "Game Over"
+
+
+
+
 running = True
 
 
@@ -238,10 +250,12 @@ while running:
                     "to_x" :  3 , # x축의 이동방향, -3이면 왼쪽 , 3이면 오른쪽 방정
                     "to_y" : -6, # y축 이동방향
                     "init_spd_y" : ball_speed_y[ball_img_idx + 1] # y의 최초 속도
-                    })  
+                    }) 
                 
-                break
-
+                break ## 바로 위에 있는 for문을 멈추는 동작 / else:문을 통해 안쪽 for문이 빠지며 바로 밑에있는, 밑에 있는 break로 진행된다.
+            else: ## for문의 else가 적용 되며, 여기에 올려면 for문에 값이 없을때 여기로 올 수 있으며, 
+                continue # 이 문구를 통해 바로 위에 있는 for문이 아닌 그 위에 있는 for문으로 들어가지며, 안쪽 for문은 무시하고 바깥쪽의 for문이 쭉 진행되어 바로 밑에 있는 break로 진행
+            break ## 그 다음 위에 있는 for문을 멈추는 문구
     # 충돌된 공 or 무기 없애기
     if ball_to_remove > -1 :
         del balls[ball_to_remove] # del 은 해당 인덱스에 위치한 값을 제거 / .remove("") "" 안에 있는 값을 제거
@@ -251,7 +265,10 @@ while running:
         del weapons[weapon_to_remove]
         weapon_to_remove = -1 # 지우는값 초기화  
 
-
+    # 모든 공이 없을 경우
+    if len(balls) == 0:
+        game_result = "Mission Complete"
+        running = False
 
 
     # 5. 화면 그리기
@@ -270,15 +287,36 @@ while running:
 
     screen.blit(character,(character_x_pos,character_y_pos))
 
-    
+
+
+    # 경과 시간
+    elapsed_time = (pygame.time.get_ticks() - start_ticks) / 1000
+    timer = game_font.render("Time : {}".format(int(total_time - elapsed_time)), True, (255,255,255))
+    screen.blit(timer, (10, 10))
+
+    if total_time - elapsed_time < 0:
+        game_result = "Time Over"
+        running = False
+
+
     # for weapon_x_pos, weapon_y_pos in weapons:
     #     screen.blit(weapon,(weapon_x_pos,weapon_y_pos)) 
     # 만약 이걸 여기다가 쓰면 그 메이플 스토리처럼 펫이 캐릭터 앞에 있는것처럼 무기 발사체가 캐릭터 앞에 있게 된다.
     # 그걸 방지하기 위해 순서를 배경 > 무기발사 > 스테이지 땅 > 캐릭터로 바꾼것.
-    # 좀 더 자세히 할려면 발사체의 y축 맨 밑을 기준으로 캐릭터의 크기만큼 올리면 좀 더 완벽해짐.
+    # 좀 더 자세히 할려면 발사체의 y축 맨 밑을 기준으로 캐릭터의 크기만큼 올리면 좀 더i 완벽해짐.
 
     pygame.display.update() 
     
+
+# 게임 오버 메세지
+msg = game_font.render(game_result, True,(255,255,0)) # 노란색
+msg_rect = msg.get_rect(center=(int(screen_width / 2), int(screen_height / 2)))
+screen.blit(msg,msg_rect)
+
+pygame.display.update()
+
+# 게임 종료 메세지 후 2초 동안 딜레이.
+pygame.time.delay(2000)
 
 # 게임 종료o
 pygame.quit()

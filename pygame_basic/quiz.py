@@ -2,6 +2,8 @@ import pygame
 from pygame.constants import K_LEFT, K_RIGHT
 from random import *
 
+# 똥 피하기 게임.
+
 
 
 
@@ -28,11 +30,14 @@ enemy = pygame.image.load("C:\\Users\\kang\\Desktop\\Pythonworkspace\\pygame_bas
 # FPS(5. frame_per_second 시작)
 clock = pygame.time.Clock()
 
+total_time = 100
+start_time = pygame.time.get_ticks()
+
 ################################################
 
 # 1. 사용자 게임 초기화( 배경 화면, 게임, 이미지, 좌표, 폰트 등)
 
-
+game_font = pygame.font.Font(None,20)
 
 # 캐릭터 , 적 상세정보
 character_size = character.get_rect().size # 가로 세로 값이 두개로 나온다... 
@@ -48,8 +53,8 @@ character_y_pos = screen_height - character_height
 
 
 
-enemy_x_pos = (screen_width/2) - (enemy_width/2)
-enemy_y_pos = screen_height - character_height
+enemy_x_pos = randint(0,int(480-enemy_width))
+enemy_y_pos = 0
 
 
 
@@ -57,6 +62,9 @@ to_x = 0
 to_y = 0
 
 character_speed = 0.5
+
+enemy_speed = 0.3
+
 
 running = True 
 
@@ -113,23 +121,52 @@ while running:
     # character_x_pos += to_x * dt # 방지턱 문구보다 밑에다가 쓰면 to_x * dt만큼 넘어가고 다시 돌아온다 .
     # 순서의 중요성.
 
-    
+    enemy_y_pos += enemy_speed * dt
 
 
     # 3. 게임 캐릭터 위치 정의
-        
+
+
+
+
+    if enemy_y_pos  + enemy_height >640:
+        enemy_x_pos = randint(0,int(480-enemy_width))
+        enemy_y_pos = 0
+
+
 
     # 4. 충돌 처리
+    character_rect = character.get_rect()
+    character_rect.left = character_x_pos
+    character_rect.top = character_y_pos
 
+    enemy_rect = enemy.get_rect()
+    enemy_rect.left = enemy_x_pos
+    enemy_rect.top = enemy_y_pos
+
+    if character_rect.colliderect(enemy_rect):
+        running = False
+        break
+
+
+    
 
 
     # 5. 화면 그리기
     screen.blit(background,(0,0))
+    elapsed_time = (pygame.time.get_ticks() - start_time) / 1000 # 좀 알아보기 .
+    timer = game_font.render("Time : {}".format(int(total_time - elapsed_time)), True, (255,255,255))
+    screen.blit(timer, (10, 10))
     screen.blit(character,(character_x_pos,character_y_pos))
+    screen.blit(enemy,(enemy_x_pos, enemy_y_pos))
 
-
+    if total_time - elapsed_time < 0:
+        running = False
+    
 
     pygame.display.update() 
+
+pygame.time.delay(2000)
 
 
 # 게임 종료o

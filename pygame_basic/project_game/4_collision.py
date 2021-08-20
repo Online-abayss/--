@@ -218,7 +218,7 @@ while running:
 
     if weapon_to_remove > -1:
         del weapons[weapon_to_remove]
-        weapon_to_remove = -1        
+        weapon_to_remove = -1 # 지우는값 초기화  
 
 
 
