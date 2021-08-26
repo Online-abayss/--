@@ -7,7 +7,7 @@ from random import *
 # 보안하기 (1. 똥을 3개까지 늘리기[enemy를 3까지 늘리는 방법 ??])
 # 2. 3개까지 늘리지만 서로 겹치지 않게하기.
 # 3. 띵킹.  
-
+        # 우선 리스트로 하는거 말고 걍 노가다로 복붙하는 형식으로 enemy3개 늘려서 겹치지 않게 해서 해보기.
 
 
 ################################################
@@ -28,7 +28,11 @@ background = pygame.image.load("C:\\Users\\kang\\Desktop\\Pythonworkspace\\pygam
 
 character = pygame.image.load("C:\\Users\\kang\\Desktop\\Pythonworkspace\\pygame_basic\\character.png")
 
-enemy = pygame.image.load("C:\\Users\\kang\\Desktop\\Pythonworkspace\\pygame_basic\\enemy.png")
+enemy_images = [
+    pygame.image.load("C:\\Users\\kang\\Desktop\\Pythonworkspace\\pygame_basic\\enemy.png"),
+    pygame.image.load("C:\\Users\\kang\\Desktop\\Pythonworkspace\\pygame_basic\\enemy.png"),
+    pygame.image.load("C:\\Users\\kang\\Desktop\\Pythonworkspace\\pygame_basic\\enemy.png")
+]
 
 # FPS(5. frame_per_second 시작)
 clock = pygame.time.Clock()
@@ -47,17 +51,31 @@ character_size = character.get_rect().size # 가로 세로 값이 두개로 나�
 character_width = character_size[0]
 character_height = character_size[1]
 
-enemy_size = enemy.get_rect().size
-enemy_width = enemy_size[0]
-enemy_height = enemy_size[1]
+# enemy_size = enemy.get_rect().size
+# enemy_width = enemy_size[0]
+# enemy_height = enemy_size[1]
 
 character_x_pos = (screen_width/2) - (character_width/2)
 character_y_pos = screen_height - character_height
 
+enemy_speed_y = [0.3 , 0.375, 0.45]
+
+# 적들
+enemys = []
 
 
-enemy_x_pos = randint(0,int(480-enemy_width))
-enemy_y_pos = 0
+#적들 설정.
+enemys.append({
+    "pos_x" : randint(0,410), # 공의 x 좌표
+    "pos_y" : 0, # 공의 y 좌표
+    "img_idx" : 0, # 공의 이미지 index
+    "init_spd_y" : enemy_speed_y[0] # y의 최초 속도
+})
+
+
+
+# enemy_x_pos = randint(0,int(480-enemy_width))
+# enemy_y_pos = 0
 
 
 
@@ -66,7 +84,7 @@ to_y = 0
 
 character_speed = 0.5
 
-enemy_speed = 0.3
+# enemy_speed = 0.3
 
 
 running = True 
@@ -121,20 +139,28 @@ while running:
         character_x_pos = screen_width - character_width
 
 
+
     # character_x_pos += to_x * dt # 방지턱 문구보다 밑에다가 쓰면 to_x * dt만큼 넘어가고 다시 돌아온다 .
     # 순서의 중요성.
 
-    enemy_y_pos += enemy_speed * dt
+    # enemy_y_pos += enemy_speed * dt
 
 
     # 3. 게임 캐릭터 위치 정의
 
+    for enemy_idx, enemy_val in enumerate(enemys):
+        enemy_pos_x = enemy_val["pos_x"]
+        enemy_pos_y = enemy_val["pos_y"]
+        enemy_img_idx = enemy_val["img_idx"]
 
+        enemy_rect = enemy_images[enemy_img_idx].get_rect()
+        enemy_size = enemy_images[enemy_img_idx].get_rect().size
+        enemy_width = enemy_size[0]
+        enemy_height = enemy_size[1]
 
-
-    if enemy_y_pos  + enemy_height >640:
-        enemy_x_pos = randint(0,int(480-enemy_width))
-        enemy_y_pos = 0
+    # if enemy_y_pos  + enemy_height >640:
+    #     enemy_x_pos = randint(0,int(480-enemy_width))
+    #     enemy_y_pos = 0
 
 
 
@@ -143,9 +169,9 @@ while running:
     character_rect.left = character_x_pos
     character_rect.top = character_y_pos
 
-    enemy_rect = enemy.get_rect()
-    enemy_rect.left = enemy_x_pos
-    enemy_rect.top = enemy_y_pos
+    # enemy_rect = enemy.get_rect()
+    # enemy_rect.left = enemy_x_pos
+    # enemy_rect.top = enemy_y_pos
 
     if character_rect.colliderect(enemy_rect):
         running = False
@@ -161,7 +187,13 @@ while running:
     timer = game_font.render("Time : {}".format(int(total_time - elapsed_time)), True, (255,255,255))
     screen.blit(timer, (10, 10))
     screen.blit(character,(character_x_pos,character_y_pos))
-    screen.blit(enemy,(enemy_x_pos, enemy_y_pos))
+    # screen.blit(enemy,(enemy_x_pos, enemy_y_pos))
+
+    for idx, val in enumerate(enemys):
+        enemy_pos_x = val["pos_x"]
+        enemy_pos_y = val["pos_y"]
+        enemy_img_idx = val["img_idx"]
+        screen.blit(enemy_images[enemy_img_idx],(enemy_pos_x,enemy_pos_y))
 
     if total_time - elapsed_time < 0:
         running = False
