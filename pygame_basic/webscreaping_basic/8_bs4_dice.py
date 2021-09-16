@@ -30,6 +30,6 @@ for cartoon in cartoons:
     total_rates += float(rate)
 
 print("전체 점수 : ", total_rates)
-print("평균 점수 : ", total_rates / len(cartoons))ㅡ
+print("평균 점수 : ", total_rates / len(cartoons))
 
 # beatutifulsoup 한국어로 되여 있는 예제들도 있다.
