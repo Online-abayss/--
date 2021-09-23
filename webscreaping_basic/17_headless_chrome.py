@@ -1,7 +1,20 @@
-
-from typing import Counter
 from selenium import webdriver
-browser = webdriver.Chrome()
+
+options = webdriver.ChromeOptions()
+options.add_argument("--headless")
+options.add_argument("--no-sandbox")
+options.add_argument("--disable-dev-shm-usage")
+
+chromedriver = './chromedriver' 
+driver = webdriver.Chrome(chromedriver, options=options )
+driver.get('https://entertain.daum.net/') 
+print(driver.title) 
+print(driver.current_url)
+
+options.headless = True
+options.add_argument("window-size=1366*768")
+
+browser = webdriver.Chrome(options=options)
 browser.maximize_window()
 
 # 페이지 이동
